@@ -1,9 +1,9 @@
 package sample;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import com.sun.rowset.CachedRowSetImpl;
+
+import javax.swing.plaf.nimbus.State;
+import java.sql.*;
 
 public class Controller {
     private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
@@ -61,5 +61,32 @@ public class Controller {
             }
             dbDisconnect();
         }
+    }
+
+    public static ResultSet dbExcecute(String sqlQuery) throws ClassNotFoundException, SQLException{
+        Statement stmt = null;
+        ResultSet rs = null;
+        CachedRowSetImpl crs = null;
+
+        try{
+            dbConnect();
+            stmt = connect.createStatement();
+            rs = stmt.executeQuery(sqlQuery);
+            crs = new CachedRowSetImpl();
+            crs.populate(rs);
+        } catch (SQLException e){
+            System.out.println("Error in dbExceute operation: "+e);
+            throw e;
+        }
+        finally{
+            if(rs != null){
+                rs.close();
+            }
+            if(stmt != null){
+                stmt.close();
+            }
+            dbDisconnect();
+        }
+        return crs;
     }
 }
